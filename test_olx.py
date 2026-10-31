@@ -63,4 +63,30 @@ for ad in offers:
         continue
 
     if price_val < MIN_PRICE or price_val > MAX_PRICE:
-        print(f"[-] DROPPED ({price_val} RON
+        print(f"[-] DROPPED ({price_val} RON out of range): {title}")
+        dropped += 1
+        continue
+
+    # 2. Hardware check: must contain '3ds' or '2ds'
+    if not any(target in title_lower for target in TARGET_HARDWARE):
+        print(f"[-] DROPPED (Not a 3DS/2DS console/bundle): {title}")
+        dropped += 1
+        continue
+
+    # 3. Clone check: reject emulation consoles
+    if any(clone in title_lower for clone in CLONE_HANDHELDS):
+        print(f"[-] DROPPED (Emulation handheld): {title}")
+        dropped += 1
+        continue
+
+    # Listing passes all checks
+    city = ad.get("location", {}).get("city", {}).get("name", "România")
+    print(f"\n[+] VALID MATCH: {title}")
+    print(f"    Price:    {price_val} RON")
+    print(f"    Location: {city}")
+    print(f"    Link:     {ad_url}\n")
+    matches += 1
+
+print("=" * 50)
+print(f"TEST RESULT: {matches} valid matches kept | {dropped} dropped")
+print("=" * 50)
