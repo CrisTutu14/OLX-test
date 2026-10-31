@@ -1,10 +1,16 @@
-name: Test OLX Scraper
+name: OLX Nintendo 3DS Monitor
 
 on:
   workflow_dispatch:
+  schedule:
+    # Runs every 10 minutes (cron runs entirely on GitHub's servers)
+    - cron: '*/10 * * * *'
+
+permissions:
+  contents: write
 
 jobs:
-  run-test:
+  check-olx:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -18,5 +24,15 @@ jobs:
       - name: Install dependencies
         run: pip install curl_cffi
 
-      - name: Run OLX Test
+      - name: Run Scraper
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
         run: python test_olx.py
+
+      - name: Commit seen IDs to state
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add seen_ids.txt || true
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Update seen listings cache" && git push)
