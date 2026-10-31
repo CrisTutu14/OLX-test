@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   schedule:
     # Runs every 10 minutes (cron runs entirely on GitHub's servers)
-    - cron: '*/10 * * * *'
+    - cron: '*/5 * * * *'
 
 permissions:
   contents: write
